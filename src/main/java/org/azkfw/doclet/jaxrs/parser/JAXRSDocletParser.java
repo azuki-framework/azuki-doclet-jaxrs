@@ -138,6 +138,10 @@ public class JAXRSDocletParser extends AbstractDocletParser implements DocletPar
 				} else {
 					api.setPath(path);
 				}
+			} else {
+				if (null != areas.getPath() && 0 < areas.getPath().length()) {
+					api.setPath(Paths.get(areas.getPath()).toString());
+				}
 			}
 		}
 		api.addConsumes(areas.getConsumes());

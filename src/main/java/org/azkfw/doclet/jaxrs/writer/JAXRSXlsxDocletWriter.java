@@ -92,7 +92,17 @@ public class JAXRSXlsxDocletWriter {
 			Collections.sort(bufApis, new Comparator<APIModel>() {
 				@Override
 				public int compare(APIModel o1, APIModel o2) {
-					return o1.getPath().compareTo(o2.getPath());
+					String s1 = o1.getPath();
+					String s2 = o2.getPath();
+					if (null == s1 && null == s2) {
+						return 0;
+					} else if (null == s2) {
+						return 1;
+					} else if (null == s1) {
+						return -1;
+					} else {
+						return s1.compareTo(s2);
+					}
 				}
 			});
 

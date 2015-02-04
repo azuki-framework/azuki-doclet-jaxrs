@@ -32,6 +32,7 @@ public class APIModel {
 
 	public String id;
 	public String name;
+	public String comment;
 	public String path;
 	public Set<String> methods;
 	public Set<String> consumes;
@@ -40,6 +41,7 @@ public class APIModel {
 	public APIModel() {
 		id = null;
 		name = null;
+		comment = null;
 		path = null;
 		methods = new HashSet<String>();
 		consumes = new HashSet<String>();
@@ -60,6 +62,14 @@ public class APIModel {
 
 	public String getName() {
 		return name;
+	}
+
+	public void setComment(final String comment) {
+		this.comment = comment;
+	}
+
+	public String getComment() {
+		return comment;
 	}
 
 	public void setPath(final String path) {

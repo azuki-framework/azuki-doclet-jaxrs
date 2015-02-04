@@ -28,7 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -108,18 +111,13 @@ public class JAXRSXlsxDocletWriter {
 
 			XSSFWorkbook wb = new XSSFWorkbook();
 			XSSFSheet sheetAPIList = wb.createSheet("IF一覧");
+			printSheet(wb, sheetAPIList, bufApis);
 
-			for (int i = 0; i < bufApis.size(); i++) {
-				APIModel api = bufApis.get(i);
-
-				XSSFRow row = sheetAPIList.createRow(i);
-				XSSFCell cell = null;
-				cell = row.createCell(0, Cell.CELL_TYPE_STRING);
-				cell.setCellValue(s(api.getId()));
-				cell = row.createCell(1, Cell.CELL_TYPE_STRING);
-				cell.setCellValue(s(api.getName()));
-				cell = row.createCell(2, Cell.CELL_TYPE_STRING);
-				cell.setCellValue(s(api.getPath()));
+			for (APIModel api : bufApis) {
+				if (null != api.getId() && 0 < api.getId().length()) {
+					XSSFSheet sheetApi = wb.createSheet(api.getId());
+					printSheet(wb, sheetApi, api);
+				}
 			}
 
 			FileOutputStream out = new FileOutputStream(new File("sample.xlsx"));
@@ -133,12 +131,107 @@ public class JAXRSXlsxDocletWriter {
 		}
 	}
 
+	private void printSheet(final XSSFWorkbook wb, final XSSFSheet sheet, final APIModel api) {
+		
+		////////////////////////////////////////////////////
+		XSSFRow row = null;
+		XSSFCell cell = null;
+		
+		////////////////////////////////////////////////////
+
+		
+		row = sheet.createRow(1); //////////////////////////
+		cell = row.createCell(1, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("機能名");
+		
+		cell = row.createCell(5, Cell.CELL_TYPE_STRING);
+		cell.setCellValue(s(api.getName()));
+		
+		cell = row.createCell(22, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("文字コード");
+		
+		cell = row.createCell(25, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("TUF-8");
+		
+		row = sheet.createRow(2); //////////////////////////
+		cell = row.createCell(1, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("URL");		
+		cell = row.createCell(5, Cell.CELL_TYPE_STRING);
+		cell.setCellValue(s(api.getPath()));
+
+		cell = row.createCell(15, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("メソッド");
+		cell = row.createCell(18, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("");
+	}
+	private void printSheet(final XSSFWorkbook wb, final XSSFSheet sheet, final List<APIModel> apis) {
+
+		XSSFCell cell = null;
+		XSSFRow row = null;
+
+		////////////////////////////////////////////////////
+		XSSFFont fontBold = wb.createFont();
+		fontBold.setBold(true);
+
+		CellStyle styleHeader = wb.createCellStyle();
+		styleHeader.setFillPattern(CellStyle.SOLID_FOREGROUND);
+		styleHeader.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());
+		styleHeader.setFont(fontBold);
+		styleHeader.setBorderTop(CellStyle.BORDER_THIN);
+		styleHeader.setBorderLeft(CellStyle.BORDER_THIN);
+		styleHeader.setBorderRight(CellStyle.BORDER_THIN);
+		styleHeader.setBorderBottom(CellStyle.BORDER_DOUBLE);
+
+		row = sheet.createRow(0); //////////////////////////
+		cell = row.createCell(1, Cell.CELL_TYPE_STRING);
+
+		CellStyle style1 = wb.createCellStyle();
+		style1.setFont(fontBold);
+		cell.setCellStyle(style1);
+		cell.setCellValue("外部I/F (API) 一覧");
+
+		row = sheet.createRow(1); //////////////////////////
+		cell = row.createCell(1, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("APIの一覧を下記の通り定義する");
+
+		row = sheet.createRow(4); //////////////////////////
+		cell = row.createCell(1, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("ID");
+		cell.setCellStyle(styleHeader);
+		cell = row.createCell(2, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("Group");
+		cell.setCellStyle(styleHeader);
+		cell = row.createCell(3, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("Name");
+		cell.setCellStyle(styleHeader);
+		cell = row.createCell(4, Cell.CELL_TYPE_STRING);
+		cell.setCellValue("Comment");
+		cell.setCellStyle(styleHeader);
+
+		int offsetRow = 5;
+		int offsetCol = 1;
+		for (int i = 0; i < apis.size(); i++) {
+			APIModel api = apis.get(i);
+
+			row = sheet.createRow(offsetRow + i);
+
+			cell = row.createCell(offsetCol + 0, Cell.CELL_TYPE_STRING);
+			cell.setCellValue(s(api.getId()));
+
+			cell = row.createCell(offsetCol + 2, Cell.CELL_TYPE_STRING);
+			cell.setCellValue(s(api.getName()));
+
+			cell = row.createCell(offsetCol + 3, Cell.CELL_TYPE_STRING);
+			cell.setCellValue(s(api.getComment()));
+		}
+	}
+
 	private void addApi(final APIModel api) {
 		if (!apis.containsKey(api.getPath())) {
 			apis.put(api.getPath(), api);
 		}
 	}
-	
+
 	private static String s(final String string) {
 		if (null != string) {
 			return string;
